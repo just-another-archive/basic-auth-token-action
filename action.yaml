@@ -1,0 +1,30 @@
+name: Basic auth token action
+description: Sets an auth token for git client
+
+inputs:
+  username:
+    description: username value
+    required: true
+
+  password:
+    description: token value or password
+    required: true
+
+  scope:
+    description: scope of the token
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        username='${{ inputs.username }}'
+        password='${{ inputs.password }}'
+        scope='${{ inputs.scope }}'
+
+        credentials="$(echo -n "$username:$password" | base64)"
+        header="Authorization: Basic $credentials"
+
+        git config --local "http.https://github.com/$scope.extraheader" "$header"
